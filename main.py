@@ -54,8 +54,8 @@ async def run_on_account(account: dict, location: str, value: str) -> str:
             await page.wait_for_load_state("networkidle")
 
             # ── ③ 場所をページ内検索してクリック ────────────
-            # ページ内に location の文字列があるリンク/要素を探してクリック
-            target = page.get_by_text(location, exact=False).first
+            # a・button のみを対象に完全一致で検索（ラベル誤クリック防止）
+            target = page.locator(f"a, button").filter(has_text=location).first
             await target.wait_for(state="visible", timeout=10000)
             await target.click()
             await page.wait_for_load_state("networkidle")
