@@ -66,11 +66,15 @@ async def run_on_account(account: dict, location: str, value: str) -> str:
             await field.wait_for(state="visible", timeout=10000)
             await field.fill(value)
 
-            # ── ⑤ 送信 ────────────────────────────────────
-            await page.locator(
-                "button[type='submit'], input[type='submit'], "
-                "button:has-text('送信'), button:has-text('保存'), button:has-text('投稿')"
-            ).first.click()
+            # ── ⑤ 送信ボタンをクリック ────────────────────────
+            # 「送信」テキストのボタンを優先、なければ type=submit にフォールバック
+            submit_btn = page.get_by_role("button", name="送信")
+            if await submit_btn.count() > 0:
+                await submit_btn.first.click()
+            else:
+                await page.locator(
+                    "button[type='submit'], input[type='submit']"
+                ).first.click()
             await page.wait_for_load_state("networkidle")
 
             return f"✅ {account['username']} 完了"
